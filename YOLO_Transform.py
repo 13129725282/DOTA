@@ -1,4 +1,4 @@
-# 生成yolo格式的标签
+# 由DOTA格式的标签转换为yolo格式的标签
 
 import dota_utils as util
 import os
