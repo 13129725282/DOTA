@@ -1,3 +1,5 @@
+# 提取感兴趣的类别，输入标签为DOTA标签
+
 import os
 from shutil import copyfile
 
