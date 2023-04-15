@@ -1,3 +1,6 @@
+#注意 cv2.CV_IMWRITE_JPEG_QUALITY  设置图片格式为.jpeg或者.jpg的图片质量，其值为0---100（数值越大质量越高），默认95
+#实现数据增强，使用的标签是DOTA的标签
+
 import time
 import random
 import cv2 as cv
@@ -16,13 +19,13 @@ def changeLight(img, inputtxt, outputiamge, outputtxt):
     label = int(flag)
     (filepath, tempfilename) = os.path.split(inputtxt)
     (filename, extension) = os.path.splitext(tempfilename)
-    outputiamge = os.path.join(outputiamge + "/" + filename + "_" + str(label) + ".png")
+    outputiamge = os.path.join(outputiamge + "/" + filename + "_" + str(label) + ".jpg")
     outputtxt = os.path.join(outputtxt + "/" + filename + "_" + str(label) + extension)
 
     ima_gamma = exposure.adjust_gamma(img, 0.5)
 
     shutil.copyfile(inputtxt, outputtxt)
-    cv.imwrite(outputiamge, ima_gamma)
+    cv.imwrite(outputiamge, ima_gamma,[int(cv.IMWRITE_JPEG_QUALITY), 50])
 
 
 # 添加高斯噪声
@@ -44,11 +47,11 @@ def gasuss_noise(image, inputtxt, outputiamge, outputtxt, mean=0, var=0.01):
 
     (filepath, tempfilename) = os.path.split(inputtxt)
     (filename, extension) = os.path.splitext(tempfilename)
-    outputiamge = os.path.join(outputiamge + "/" + filename + "_gasunoise_" + str(int(mean)) + "_" + str(int(var)) + ".png")
+    outputiamge = os.path.join(outputiamge + "/" + filename + "_gasunoise_" + str(int(mean)) + "_" + str(int(var)) + ".jpg")
     outputtxt = os.path.join(outputtxt + "/" + filename + "_gasunoise_" + str(int(mean)) + "_" + str(int(var)) + extension)
 
     shutil.copyfile(inputtxt, outputtxt)
-    cv.imwrite(outputiamge, out)
+    cv.imwrite(outputiamge, out,[int(cv.IMWRITE_JPEG_QUALITY), 50])
 
 
 # 调整对比度
@@ -73,10 +76,10 @@ def ContrastAlgorithm(rgb_img, inputtxt, outputiamge, outputtxt):
         temp_imag[:, :, num] = out_image
     (filepath, tempfilename) = os.path.split(inputtxt)
     (filename, extension) = os.path.splitext(tempfilename)
-    outputiamge = os.path.join(outputiamge + "/" + filename + "_contrastAlgorithm" + ".png")
+    outputiamge = os.path.join(outputiamge + "/" + filename + "_contrastAlgorithm" + ".jpg")
     outputtxt = os.path.join(outputtxt + "/" + filename + "_contrastAlgorithm" + extension)
     shutil.copyfile(inputtxt, outputtxt)
-    cv.imwrite(outputiamge, temp_imag)
+    cv.imwrite(outputiamge, temp_imag,[int(cv.IMWRITE_JPEG_QUALITY), 50])
 
 
 # 旋转
@@ -95,7 +98,7 @@ def rotate_img_bbox(img, inputtxt, temp_outputiamge, temp_outputtxt, angle, scal
 
         (filepath, tempfilename) = os.path.split(inputtxt)
         (filename, extension) = os.path.splitext(tempfilename)
-        outputiamge = os.path.join(temp_outputiamge + "/" + filename + "_rotate_" + str(nAgree[numAngle]) + ".png")
+        outputiamge = os.path.join(temp_outputiamge + "/" + filename + "_rotate_" + str(nAgree[numAngle]) + ".jpg")
         outputtxt = os.path.join(temp_outputtxt + "/" + filename + "_rotate_" + str(nAgree[numAngle]) + extension)
 
         rot_mat = cv.getRotationMatrix2D((nw * 0.5, nh * 0.5), nAgree[numAngle], scale)
@@ -104,7 +107,7 @@ def rotate_img_bbox(img, inputtxt, temp_outputiamge, temp_outputtxt, angle, scal
         rot_mat[1, 2] += rot_move[1]
         # 仿射变换
         rotat_img = cv.warpAffine(img, rot_mat, (int(math.ceil(nw)), int(math.ceil(nh))), flags=cv.INTER_LANCZOS4)
-        cv.imwrite(outputiamge, rotat_img)
+        cv.imwrite(outputiamge, rotat_img,[int(cv.IMWRITE_JPEG_QUALITY), 50])
 
         save_txt = open(outputtxt, 'w')
         f = open(inputtxt)
@@ -142,18 +145,18 @@ def rotate_img_bbox(img, inputtxt, temp_outputiamge, temp_outputtxt, angle, scal
 def filp_pic_bboxes(img, inputtxt, outputiamge, outputtxt):
     (filepath, tempfilename) = os.path.split(inputtxt)
     (filename, extension) = os.path.splitext(tempfilename)
-    output_vert_flip_img = os.path.join(outputiamge + "/" + filename + "_vert_flip" + ".png")
+    output_vert_flip_img = os.path.join(outputiamge + "/" + filename + "_vert_flip" + ".jpg")
     output_vert_flip_txt = os.path.join(outputtxt + "/" + filename + "_vert_flip" + extension)
-    output_horiz_flip_img = os.path.join(outputiamge + "/" + filename + "_horiz_flip" + ".png")
+    output_horiz_flip_img = os.path.join(outputiamge + "/" + filename + "_horiz_flip" + ".jpg")
     output_horiz_flip_txt = os.path.join(outputtxt + "/" + filename + "_horiz_flip" + extension)
 
     h, w, _ = img.shape
     # 垂直翻转
     vert_flip_img = cv.flip(img, 1)
-    cv.imwrite(output_vert_flip_img, vert_flip_img)
+    cv.imwrite(output_vert_flip_img, vert_flip_img,[int(cv.IMWRITE_JPEG_QUALITY), 50])
     # 水平翻转
     horiz_flip_img = cv.flip(img, 0)
-    cv.imwrite(output_horiz_flip_img, horiz_flip_img)
+    cv.imwrite(output_horiz_flip_img, horiz_flip_img,[int(cv.IMWRITE_JPEG_QUALITY), 50])
     # ---------------------- 调整boundingbox ----------------------
     save_vert_txt = open(output_vert_flip_txt, 'w')
     save_horiz_txt = open(output_horiz_flip_txt, 'w')
@@ -221,28 +224,28 @@ def shift_pic_bboxes(img, inputtxt, outputiamge, outputtxt):
     (filename, extension) = os.path.splitext(tempfilename)
     if x >= 0 and y >= 0:
         outputiamge = os.path.join(
-            outputiamge + "/" + filename + "_shift_" + str(int(round(x, 3))) + "_" + str(int(round(y, 3))) + ".png")
+            outputiamge + "/" + filename + "_shift_" + str(int(round(x, 3))) + "_" + str(int(round(y, 3))) + ".jpg")
         outputtxt = os.path.join(
             outputtxt + "/" + filename + "_shift_" + str(int(round(x, 3))) + "_" + str(int(round(y, 3))) + extension)
     elif x >= 0 and y < 0:
         outputiamge = os.path.join(
-            outputiamge + "/" + filename + "_shift_" + str(int(round(x, 3))) + "__" + str(int(round(abs(y), 3))) + ".png")
+            outputiamge + "/" + filename + "_shift_" + str(int(round(x, 3))) + "__" + str(int(round(abs(y), 3))) + ".jpg")
         outputtxt = os.path.join(
             outputtxt + "/" + filename + "_shift_" + str(int(round(x, 3))) + "__" + str(int(round(abs(y), 3))) + extension)
     elif x < 0 and y >= 0:
         outputiamge = os.path.join(
-            outputiamge + "/" + filename + "_shift__" + str(int(round(abs(x), 3))) + "_" + str(int(round(y, 3))) + ".png")
+            outputiamge + "/" + filename + "_shift__" + str(int(round(abs(x), 3))) + "_" + str(int(round(y, 3))) + ".jpg")
         outputtxt = os.path.join(
             outputtxt + "/" + filename + "_shift__" + str(int(round(abs(x), 3))) + "_" + str(int(round(y, 3))) + extension)
     elif x < 0 and y < 0:
         outputiamge = os.path.join(
-            outputiamge + "/" + filename + "_shift__" + str(int(round(abs(x), 3))) + "__" + str(int(round(abs(y), 3))) + ".png")
+            outputiamge + "/" + filename + "_shift__" + str(int(round(abs(x), 3))) + "__" + str(int(round(abs(y), 3))) + ".jpg")
         outputtxt = os.path.join(
             outputtxt + "/" + filename + "_shift__" + str(int(round(abs(x), 3))) + "__" + str(int(round(abs(y), 3))) + extension)
 
     M = np.float32([[1, 0, x], [0, 1, y]])  # x为向左或右移动的像素值,正为向右负为向左; y为向上或者向下移动的像素值,正为向下负为向上
     shift_img = cv.warpAffine(img, M, (img.shape[1], img.shape[0]))
-    cv.imwrite(outputiamge, shift_img)
+    cv.imwrite(outputiamge, shift_img,[int(cv.IMWRITE_JPEG_QUALITY), 50])
     # ---------------------- 平移boundingbox ----------------------
     save_txt = open(outputtxt, "w")
     f = open(inputtxt)
@@ -315,11 +318,11 @@ def crop_img_bboxes(img, inputtxt, outputiamge, outputtxt):
     (filename, extension) = os.path.splitext(tempfilename)
     outputiamge = os.path.join(outputiamge + "/" + filename + "_crop_" + str(crop_x_min) + "_" +
                                str(crop_y_min) + "_" + str(crop_x_max) + "_" +
-                               str(crop_y_max) + ".png")
+                               str(crop_y_max) + ".jpg")
     outputtxt = os.path.join(outputtxt + "/" + filename + "_crop_" + str(crop_x_min) + "_" +
                              str(crop_y_min) + "_" + str(crop_x_max) + "_" +
                              str(crop_y_max) + extension)
-    cv.imwrite(outputiamge, crop_img)
+    cv.imwrite(outputiamge, crop_img,[int(cv.IMWRITE_JPEG_QUALITY), 50])
     # ---------------------- 裁剪boundingbox ----------------------
     # 裁剪后的boundingbox坐标计算
     save_txt = open(outputtxt, "w")
@@ -340,11 +343,19 @@ def crop_img_bboxes(img, inputtxt, outputiamge, outputtxt):
         save_txt.write(crop_str)
 
 if __name__ == '__main__':
-    inputiamge = "G://DOTA//train//need_aug//baseball-diamond//images"
-    inputtxt = "G://DOTA//train//need_aug//baseball-diamond//labels"
-    outputiamge = "G://DOTA//train//aug_result//baseball-diamond//images"
-    outputtxt = "G://DOTA//train//aug_result//baseball-diamond//labels"
-    angle = [30, 60, 90, 120, 150, 180]
+    #inputiamge = "G://DOTA//org//train//new_images"
+    #inputtxt = "G://DOTA//org//train//new_labelTxt"
+    #outputiamge = "G://DOTA//train//aug//images"
+    #outputtxt = "G://DOTA//train//aug//labels"
+    
+    inputiamge = "G://DOTA//train//object//large-vehicle//images"
+    inputtxt = "G://DOTA//train//object//large-vehicle//labels"
+    outputiamge = "G://DOTA//train//aug//large-vehicle//images"
+    outputtxt = "G://DOTA//train//aug//large-vehicle//lables"
+    
+    #angle = [30, 60, 90, 120, 150, 180]
+    angle = [60]
+    #angle = [90]
     tempfilename = os.listdir(inputiamge)
     for file in tempfilename:
         (filename, extension) = os.path.splitext(file)
@@ -352,18 +363,18 @@ if __name__ == '__main__':
         input_txt = os.path.join(inputtxt + "//" + filename + ".txt")
 
         img = cv.imread(input_image)
-        # 图像亮度变化
+        # 图像亮度变化 
         changeLight(img,input_txt,outputiamge,outputtxt)
         # 加高斯噪声
         gasuss_noise(img, input_txt, outputiamge, outputtxt, mean=0, var=0.001)
         # 改变图像对比度
-        ContrastAlgorithm(img, input_txt, outputiamge, outputtxt)
+        #ContrastAlgorithm(img, input_txt, outputiamge, outputtxt)
         # 图像旋转
         rotate_img_bbox(img, input_txt, outputiamge, outputtxt, angle)
         # 图像镜像
-        filp_pic_bboxes(img, input_txt, outputiamge, outputtxt)
+        #filp_pic_bboxes(img, input_txt, outputiamge, outputtxt)
         # 平移
-        shift_pic_bboxes(img, input_txt, outputiamge, outputtxt)
+        #shift_pic_bboxes(img, input_txt, outputiamge, outputtxt)
         # 剪切
-        crop_img_bboxes(img, input_txt, outputiamge, outputtxt)
+        #crop_img_bboxes(img, input_txt, outputiamge, outputtxt)
     print("finished!")
