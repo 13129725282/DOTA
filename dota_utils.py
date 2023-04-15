@@ -1,3 +1,5 @@
+# 配置文件
+
 import sys
 import codecs
 import numpy as np
